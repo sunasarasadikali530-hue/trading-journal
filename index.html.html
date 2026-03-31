@@ -1,0 +1,1129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trading Journal - Daily Tracker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #0A0E27 0%, #1A1F3A 100%);
+            color: #FFFFFF;
+            min-height: 100vh;
+            padding-bottom: 100px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        header {
+            background: linear-gradient(135deg, #1A1F3A 0%, #0A0E27 100%);
+            padding: 20px 16px;
+            border-bottom: 2px solid #00D084;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        h1 {
+            font-size: 24px;
+            color: #00D084;
+        }
+
+        .header-date {
+            font-size: 12px;
+            color: #8A8F9F;
+        }
+
+        /* Navigation Tabs */
+        .nav-tabs {
+            display: flex;
+            background: #1A1F3A;
+            border-bottom: 1px solid #2A2F4A;
+            position: sticky;
+            top: 60px;
+            z-index: 99;
+            overflow-x: auto;
+        }
+
+        .nav-tab {
+            flex: 1;
+            padding: 12px;
+            background: none;
+            border: none;
+            color: #8A8F9F;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+            min-width: 80px;
+            white-space: nowrap;
+        }
+
+        .nav-tab:hover {
+            color: #00D084;
+        }
+
+        .nav-tab.active {
+            color: #00D084;
+            border-bottom-color: #00D084;
+            background: #0A0E27;
+        }
+
+        /* Content */
+        .content {
+            padding: 16px;
+            display: none;
+        }
+
+        .content.active {
+            display: block;
+        }
+
+        /* Dashboard */
+        .dashboard {
+            margin-bottom: 24px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .stat-card {
+            background: #1A1F3A;
+            border: 1px solid #2A2F4A;
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            border-left: 4px solid #00D084;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #8A8F9F;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #FFFFFF;
+        }
+
+        .stat-value.profit {
+            color: #00D084;
+        }
+
+        .stat-value.loss {
+            color: #FF4757;
+        }
+
+        .stat-value.neutral {
+            color: #FFB84D;
+        }
+
+        /* Discipline Score */
+        .discipline-card {
+            background: linear-gradient(135deg, #1A1F3A 0%, #0A0E27 100%);
+            border: 1px solid #2A2F4A;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 16px;
+        }
+
+        .discipline-label {
+            font-size: 12px;
+            color: #8A8F9F;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+
+        .discipline-score {
+            font-size: 48px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .discipline-score.excellent {
+            color: #00D084;
+        }
+
+        .discipline-score.good {
+            color: #00D084;
+        }
+
+        .discipline-score.fair {
+            color: #FFB84D;
+        }
+
+        .discipline-score.poor {
+            color: #FF4757;
+        }
+
+        .discipline-description {
+            font-size: 12px;
+            color: #8A8F9F;
+        }
+
+        /* Add Entry Form */
+        .form-section {
+            background: #1A1F3A;
+            border: 1px solid #2A2F4A;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 16px;
+        }
+
+        .form-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 16px;
+            color: #00D084;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #FFFFFF;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        input[type="date"],
+        input[type="number"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 12px;
+            background: #0A0E27;
+            border: 1px solid #2A2F4A;
+            border-radius: 8px;
+            color: #FFFFFF;
+            font-size: 14px;
+            font-family: inherit;
+        }
+
+        input[type="date"]:focus,
+        input[type="number"]:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: #00D084;
+            box-shadow: 0 0 0 3px rgba(0, 208, 132, 0.1);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+            font-family: inherit;
+        }
+
+        /* Button Groups */
+        .button-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+            gap: 8px;
+        }
+
+        .btn-option {
+            padding: 10px;
+            background: #0A0E27;
+            border: 1px solid #2A2F4A;
+            border-radius: 8px;
+            color: #8A8F9F;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-option:hover {
+            border-color: #00D084;
+        }
+
+        .btn-option.active {
+            background: #00D084;
+            color: #0A0E27;
+            border-color: #00D084;
+        }
+
+        /* Checkboxes */
+        .checkbox-group {
+            display: grid;
+            gap: 8px;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            background: #0A0E27;
+            border: 1px solid #2A2F4A;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .checkbox-item:hover {
+            border-color: #00D084;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            margin-right: 10px;
+            cursor: pointer;
+            accent-color: #00D084;
+        }
+
+        .checkbox-item label {
+            margin: 0;
+            cursor: pointer;
+            flex: 1;
+            text-transform: none;
+            letter-spacing: normal;
+            font-size: 14px;
+            text-transform: none;
+        }
+
+        /* Submit Button */
+        .btn-primary {
+            width: 100%;
+            padding: 14px;
+            background: #00D084;
+            color: #0A0E27;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 8px;
+        }
+
+        .btn-primary:hover {
+            background: #00B870;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(0, 208, 132, 0.3);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        /* Journal Entries */
+        .entry-item {
+            background: #1A1F3A;
+            border: 1px solid #2A2F4A;
+            border-left: 4px solid #00D084;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 12px;
+        }
+
+        .entry-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .entry-date {
+            font-size: 12px;
+            color: #8A8F9F;
+        }
+
+        .entry-pl {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .entry-pl.profit {
+            color: #00D084;
+        }
+
+        .entry-pl.loss {
+            color: #FF4757;
+        }
+
+        .entry-type {
+            display: inline-block;
+            background: #00D084;
+            color: #0A0E27;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+
+        .entry-emotion {
+            display: inline-block;
+            background: #FFB84D;
+            color: #0A0E27;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        .entry-plan {
+            display: inline-block;
+            background: #00D084;
+            color: #0A0E27;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: bold;
+            margin-left: 8px;
+        }
+
+        .entry-plan.no {
+            background: #FF4757;
+        }
+
+        .entry-mistakes {
+            margin-top: 10px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .mistake-tag {
+            background: #FF475720;
+            border: 1px solid #FF4757;
+            color: #FF4757;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        .entry-notes {
+            margin-top: 10px;
+            font-size: 12px;
+            color: #8A8F9F;
+            font-style: italic;
+        }
+
+        .entry-delete {
+            margin-top: 10px;
+        }
+
+        .btn-delete {
+            padding: 6px 12px;
+            background: #FF4757;
+            color: #FFFFFF;
+            border: none;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        /* Analysis */
+        .analysis-item {
+            background: #1A1F3A;
+            border: 1px solid #2A2F4A;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .analysis-label {
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .analysis-value {
+            font-size: 18px;
+            font-weight: bold;
+            color: #FF4757;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #8A8F9F;
+        }
+
+        .empty-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+        }
+
+        .empty-text {
+            font-size: 14px;
+        }
+
+        /* Summary Cards */
+        .week-summary {
+            background: #1A1F3A;
+            border: 1px solid #2A2F4A;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+        }
+
+        .week-header {
+            font-size: 13px;
+            color: #8A8F9F;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+
+        .week-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .week-stat {
+            text-align: center;
+        }
+
+        .week-stat-value {
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .week-stat-label {
+            font-size: 11px;
+            color: #8A8F9F;
+            margin-top: 4px;
+        }
+
+        /* Bottom Bar */
+        .bottom-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #1A1F3A;
+            border-top: 1px solid #2A2F4A;
+            padding: 12px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .btn-add-entry {
+            width: 100%;
+            padding: 14px;
+            background: #00D084;
+            color: #0A0E27;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-add-entry:hover {
+            background: #00B870;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: flex-end;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: #0A0E27;
+            width: 100%;
+            max-width: 600px;
+            border-radius: 16px 16px 0 0;
+            padding: 24px 16px 40px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #2A2F4A;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #00D084;
+        }
+
+        .btn-close {
+            background: none;
+            border: none;
+            color: #8A8F9F;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .btn-close:hover {
+            color: #FFFFFF;
+        }
+
+        @media (max-width: 480px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .button-group {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <div class="header-content">
+                <div>
+                    <h1>📈 Trading Journal</h1>
+                    <div class="header-date" id="headerDate"></div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Navigation Tabs -->
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="switchTab('dashboard')">Dashboard</button>
+            <button class="nav-tab" onclick="switchTab('entries')">Entries</button>
+            <button class="nav-tab" onclick="switchTab('weekly')">Weekly</button>
+            <button class="nav-tab" onclick="switchTab('analysis')">Analysis</button>
+        </div>
+
+        <!-- Dashboard Tab -->
+        <div id="dashboard" class="content active">
+            <div class="dashboard">
+                <!-- Discipline Score -->
+                <div class="discipline-card">
+                    <div class="discipline-label">Today's Discipline Score</div>
+                    <div class="discipline-score" id="disciplineScore">--</div>
+                    <div class="discipline-description" id="disciplineDesc"></div>
+                </div>
+
+                <!-- Stats -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-label">Today's P&L</div>
+                        <div class="stat-value" id="todayPL">₹0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Total Trades</div>
+                        <div class="stat-value neutral" id="totalTrades">0</div>
+                    </div>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-label">Plan Adherence</div>
+                        <div class="stat-value neutral" id="planAdherence">0%</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Mistakes</div>
+                        <div class="stat-value neutral" id="mistakesCount">0</div>
+                    </div>
+                </div>
+
+                <!-- Weekly Stats -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-label">This Week P&L</div>
+                        <div class="stat-value" id="weekPL">₹0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Weekly Trades</div>
+                        <div class="stat-value neutral" id="weekTrades">0</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Entries Tab -->
+        <div id="entries" class="content">
+            <div id="entriesList"></div>
+        </div>
+
+        <!-- Weekly Tab -->
+        <div id="weekly" class="content">
+            <div id="weeklySummary"></div>
+        </div>
+
+        <!-- Analysis Tab -->
+        <div id="analysis" class="content">
+            <div id="analysisContent"></div>
+        </div>
+    </div>
+
+    <!-- Bottom Bar -->
+    <div class="bottom-bar">
+        <button class="btn-add-entry" onclick="openAddModal()">➕ Add Entry</button>
+    </div>
+
+    <!-- Add Entry Modal -->
+    <div id="addModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">Add Trade Entry</div>
+                <button class="btn-close" onclick="closeAddModal()">✕</button>
+            </div>
+
+            <form id="entryForm" onsubmit="saveEntry(event)">
+                <!-- Date -->
+                <div class="form-group">
+                    <label for="entryDate">Date</label>
+                    <input type="date" id="entryDate" required>
+                </div>
+
+                <!-- Trade Type -->
+                <div class="form-group">
+                    <label>Trade Type</label>
+                    <div class="button-group">
+                        <button type="button" class="btn-option active" onclick="selectOption(this, 'tradeType', 'CE')">CE</button>
+                        <button type="button" class="btn-option" onclick="selectOption(this, 'tradeType', 'PE')">PE</button>
+                    </div>
+                    <input type="hidden" id="tradeType" value="CE">
+                </div>
+
+                <!-- P&L -->
+                <div class="form-group">
+                    <label for="dayPL">Day P&L (₹)</label>
+                    <input type="number" id="dayPL" step="0.01" required placeholder="e.g., 500 or -1000">
+                </div>
+
+                <!-- Emotion -->
+                <div class="form-group">
+                    <label>Emotion Before Trade</label>
+                    <div class="button-group">
+                        <button type="button" class="btn-option active" onclick="selectOption(this, 'emotion', 'Calm')">😌 Calm</button>
+                        <button type="button" class="btn-option" onclick="selectOption(this, 'emotion', 'FOMO')">😰 FOMO</button>
+                        <button type="button" class="btn-option" onclick="selectOption(this, 'emotion', 'Revenge')">😠 Revenge</button>
+                        <button type="button" class="btn-option" onclick="selectOption(this, 'emotion', 'Fear')">😨 Fear</button>
+                        <button type="button" class="btn-option" onclick="selectOption(this, 'emotion', 'Chase')">🔥 Chase</button>
+                    </div>
+                    <input type="hidden" id="emotion" value="Calm">
+                </div>
+
+                <!-- Mistakes -->
+                <div class="form-group">
+                    <label>Mistakes (if any)</label>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="mistake1" value="Revenge Trading">
+                            <label for="mistake1">Revenge Trading</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="mistake2" value="Overtrading">
+                            <label for="mistake2">Overtrading</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="mistake3" value="No Stop Loss">
+                            <label for="mistake3">No Stop Loss</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="mistake4" value="Early Exit">
+                            <label for="mistake4">Early Exit</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="mistake5" value="Late Entry">
+                            <label for="mistake5">Late Entry</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="mistake6" value="Chase Market">
+                            <label for="mistake6">Chase Market</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Plan Adherence -->
+                <div class="form-group">
+                    <label>Did I Follow My Plan?</label>
+                    <div class="button-group">
+                        <button type="button" class="btn-option active" onclick="selectOption(this, 'followPlan', 'Yes')">✅ Yes</button>
+                        <button type="button" class="btn-option" onclick="selectOption(this, 'followPlan', 'No')">❌ No</button>
+                    </div>
+                    <input type="hidden" id="followPlan" value="Yes">
+                </div>
+
+                <!-- Notes -->
+                <div class="form-group">
+                    <label for="notes">What I Learned Today</label>
+                    <textarea id="notes" placeholder="Key lessons, observations, improvements..."></textarea>
+                </div>
+
+                <button type="submit" class="btn-primary">💾 Save Entry</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Set default date to today
+        document.getElementById('entryDate').valueAsDate = new Date();
+
+        // Load data from localStorage
+        let entries = JSON.parse(localStorage.getItem('entries')) || [];
+
+        // Update header date
+        function updateHeaderDate() {
+            const options = { weekday: 'short', month: 'short', day: 'numeric' };
+            document.getElementById('headerDate').textContent = new Date().toLocaleDateString('en-US', options);
+        }
+        updateHeaderDate();
+
+        // Tab switching
+        function switchTab(tabName) {
+            document.querySelectorAll('.content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.nav-tab').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+
+            if (tabName === 'entries') updateEntriesList();
+            if (tabName === 'weekly') updateWeeklySummary();
+            if (tabName === 'analysis') updateAnalysis();
+            if (tabName === 'dashboard') updateDashboard();
+        }
+
+        // Select option
+        function selectOption(button, fieldId, value) {
+            const parent = button.parentElement;
+            parent.querySelectorAll('.btn-option').forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+            document.getElementById(fieldId).value = value;
+        }
+
+        // Modal functions
+        function openAddModal() {
+            document.getElementById('addModal').classList.add('active');
+        }
+
+        function closeAddModal() {
+            document.getElementById('addModal').classList.remove('active');
+            document.getElementById('entryForm').reset();
+            document.getElementById('entryDate').valueAsDate = new Date();
+            document.querySelectorAll('.btn-option').forEach((btn, i) => {
+                if (i % 5 === 0) btn.classList.add('active');
+                else btn.classList.remove('active');
+            });
+        }
+
+        // Save entry
+        function saveEntry(event) {
+            event.preventDefault();
+
+            const mistakes = [];
+            document.querySelectorAll('.checkbox-item input[type="checkbox"]:checked').forEach(cb => {
+                mistakes.push(cb.value);
+            });
+
+            const entry = {
+                id: Date.now(),
+                date: document.getElementById('entryDate').value,
+                tradeType: document.getElementById('tradeType').value,
+                dayPL: parseFloat(document.getElementById('dayPL').value),
+                emotion: document.getElementById('emotion').value,
+                mistakes: mistakes,
+                followPlan: document.getElementById('followPlan').value === 'Yes',
+                notes: document.getElementById('notes').value,
+            };
+
+            entries.push(entry);
+            localStorage.setItem('entries', JSON.stringify(entries));
+
+            closeAddModal();
+            updateDashboard();
+            updateEntriesList();
+
+            alert('✅ Entry saved successfully!');
+        }
+
+        // Delete entry
+        function deleteEntry(id) {
+            if (confirm('Are you sure you want to delete this entry?')) {
+                entries = entries.filter(e => e.id !== id);
+                localStorage.setItem('entries', JSON.stringify(entries));
+                updateEntriesList();
+                updateDashboard();
+                updateAnalysis();
+            }
+        }
+
+        // Calculate discipline score
+        function calculateDisciplineScore(todayEntries) {
+            if (todayEntries.length === 0) return { score: '--', desc: 'No entries today', class: 'neutral' };
+
+            let score = 100;
+
+            // Plan adherence deduction
+            const planFollowers = todayEntries.filter(e => e.followPlan).length;
+            const planAdherence = (planFollowers / todayEntries.length) * 100;
+            if (planAdherence < 100) score -= (100 - planAdherence) * 0.3;
+
+            // Mistakes deduction
+            let totalMistakes = 0;
+            todayEntries.forEach(e => totalMistakes += e.mistakes.length);
+            score -= Math.min(totalMistakes * 10, 40);
+
+            score = Math.max(0, Math.round(score));
+
+            let desc, className;
+            if (score >= 80) {
+                desc = 'Excellent discipline! 🌟';
+                className = 'excellent';
+            } else if (score >= 60) {
+                desc = 'Good discipline 👍';
+                className = 'good';
+            } else if (score >= 40) {
+                desc = 'Fair discipline, room for improvement 📈';
+                className = 'fair';
+            } else {
+                desc = 'Poor discipline, review your trades 🔄';
+                className = 'poor';
+            }
+
+            return { score, desc, class: className };
+        }
+
+        // Update dashboard
+        function updateDashboard() {
+            const today = new Date().toISOString().split('T')[0];
+            const todayEntries = entries.filter(e => e.date === today);
+
+            // Today's P&L
+            const todayPL = todayEntries.reduce((sum, e) => sum + e.dayPL, 0);
+            const todayPLEl = document.getElementById('todayPL');
+            todayPLEl.textContent = `₹${todayPL.toFixed(2)}`;
+            todayPLEl.className = todayPL >= 0 ? 'stat-value profit' : 'stat-value loss';
+
+            // Total trades
+            document.getElementById('totalTrades').textContent = todayEntries.length;
+
+            // Plan adherence
+            if (todayEntries.length > 0) {
+                const planFollowers = todayEntries.filter(e => e.followPlan).length;
+                document.getElementById('planAdherence').textContent = Math.round((planFollowers / todayEntries.length) * 100) + '%';
+            }
+
+            // Mistakes count
+            let mistakesCount = 0;
+            todayEntries.forEach(e => mistakesCount += e.mistakes.length);
+            document.getElementById('mistakesCount').textContent = mistakesCount;
+
+            // Discipline score
+            const discipline = calculateDisciplineScore(todayEntries);
+            const scoreEl = document.getElementById('disciplineScore');
+            scoreEl.textContent = discipline.score;
+            scoreEl.className = `discipline-score ${discipline.class}`;
+            document.getElementById('disciplineDesc').textContent = discipline.desc;
+
+            // Weekly stats
+            const weekStart = new Date();
+            weekStart.setDate(weekStart.getDate() - weekStart.getDay());
+            const weekStartStr = weekStart.toISOString().split('T')[0];
+            const weekEntries = entries.filter(e => e.date >= weekStartStr);
+
+            const weekPL = weekEntries.reduce((sum, e) => sum + e.dayPL, 0);
+            const weekPLEl = document.getElementById('weekPL');
+            weekPLEl.textContent = `₹${weekPL.toFixed(2)}`;
+            weekPLEl.className = weekPL >= 0 ? 'stat-value profit' : 'stat-value loss';
+
+            document.getElementById('weekTrades').textContent = weekEntries.length;
+        }
+
+        // Update entries list
+        function updateEntriesList() {
+            const today = new Date().toISOString().split('T')[0];
+            const todayEntries = entries.filter(e => e.date === today).sort((a, b) => b.id - a.id);
+
+            if (todayEntries.length === 0) {
+                document.getElementById('entriesList').innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">📭</div>
+                        <div class="empty-text">No entries yet. Start by adding your first trade!</div>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '';
+            todayEntries.forEach(entry => {
+                const mistakesHtml = entry.mistakes.length > 0 
+                    ? `<div class="entry-mistakes">${entry.mistakes.map(m => `<span class="mistake-tag">${m}</span>`).join('')}</div>`
+                    : '';
+
+                html += `
+                    <div class="entry-item">
+                        <div class="entry-header">
+                            <div>
+                                <span class="entry-type">${entry.tradeType}</span>
+                                <span class="entry-emotion">${entry.emotion}</span>
+                                <span class="entry-plan ${entry.followPlan ? '' : 'no'}">${entry.followPlan ? '✅ Plan' : '❌ Plan'}</span>
+                            </div>
+                            <div class="entry-pl ${entry.dayPL >= 0 ? 'profit' : 'loss'}">
+                                ${entry.dayPL >= 0 ? '+' : ''}₹${entry.dayPL.toFixed(2)}
+                            </div>
+                        </div>
+                        <div class="entry-date">${new Date(entry.date).toLocaleDateString()}</div>
+                        ${mistakesHtml}
+                        ${entry.notes ? `<div class="entry-notes">💭 ${entry.notes}</div>` : ''}
+                        <div class="entry-delete">
+                            <button class="btn-delete" onclick="deleteEntry(${entry.id})">Delete</button>
+                        </div>
+                    </div>
+                `;
+            });
+
+            document.getElementById('entriesList').innerHTML = html;
+        }
+
+        // Update weekly summary
+        function updateWeeklySummary() {
+            const weeks = {};
+
+            entries.forEach(entry => {
+                const date = new Date(entry.date);
+                const weekStart = new Date(date);
+                weekStart.setDate(date.getDate() - date.getDay());
+                const weekKey = weekStart.toISOString().split('T')[0];
+
+                if (!weeks[weekKey]) {
+                    weeks[weekKey] = { entries: [], pl: 0, trades: 0 };
+                }
+                weeks[weekKey].entries.push(entry);
+                weeks[weekKey].pl += entry.dayPL;
+                weeks[weekKey].trades++;
+            });
+
+            if (Object.keys(weeks).length === 0) {
+                document.getElementById('weeklySummary').innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">📭</div>
+                        <div class="empty-text">No weekly data yet.</div>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '';
+            Object.keys(weeks).sort().reverse().forEach(weekKey => {
+                const week = weeks[weekKey];
+                const weekEnd = new Date(weekKey);
+                weekEnd.setDate(weekEnd.getDate() + 6);
+
+                const plClass = week.pl >= 0 ? 'profit' : 'loss';
+
+                html += `
+                    <div class="week-summary">
+                        <div class="week-header">${new Date(weekKey).toLocaleDateString()} - ${weekEnd.toLocaleDateString()}</div>
+                        <div class="week-stats">
+                            <div class="week-stat">
+                                <div class="week-stat-value ${plClass}">₹${week.pl.toFixed(0)}</div>
+                                <div class="week-stat-label">P&L</div>
+                            </div>
+                            <div class="week-stat">
+                                <div class="week-stat-value">${week.trades}</div>
+                                <div class="week-stat-label">Trades</div>
+                            </div>
+                            <div class="week-stat">
+                                <div class="week-stat-value">${Math.round((week.entries.filter(e => e.followPlan).length / week.trades) * 100)}%</div>
+                                <div class="week-stat-label">Plan</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            document.getElementById('weeklySummary').innerHTML = html;
+        }
+
+        // Update analysis
+        function updateAnalysis() {
+            const mistakeCount = {
+                'Revenge Trading': 0,
+                'Overtrading': 0,
+                'No Stop Loss': 0,
+                'Early Exit': 0,
+                'Late Entry': 0,
+                'Chase Market': 0,
+            };
+
+            entries.forEach(entry => {
+                entry.mistakes.forEach(mistake => {
+                    if (mistakeCount.hasOwnProperty(mistake)) {
+                        mistakeCount[mistake]++;
+                    }
+                });
+            });
+
+            let html = '<div class="form-title" style="margin-bottom: 16px;">Mistake Frequency (All Time)</div>';
+
+            const sorted = Object.entries(mistakeCount).sort((a, b) => b[1] - a[1]);
+
+            sorted.forEach(([mistake, count]) => {
+                html += `
+                    <div class="analysis-item">
+                        <div class="analysis-label">${mistake}</div>
+                        <div class="analysis-value">${count}</div>
+                    </div>
+                `;
+            });
+
+            document.getElementById('analysisContent').innerHTML = html;
+        }
+
+        // Initial load
+        updateDashboard();
+    </script>
+</body>
+</html>
